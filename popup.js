@@ -1,6 +1,6 @@
 import { getActiveTabURL } from "./utils.js";
 
-const onPlay = async e => {
+const onPlay = async (e) => {
   const bookmarkTime = e.target.parentNode.parentNode.getAttribute("timestamp");
   const activeTab = await getActiveTabURL();
 
@@ -10,7 +10,7 @@ const onPlay = async e => {
   });
 };
 
-const onDelete = async e => {
+const onDelete = async (e) => {
   const activeTab = await getActiveTabURL();
   const bookmarkTime = e.target.parentNode.parentNode.getAttribute("timestamp");
   const bookmarkElementToDelete = document.getElementById(
@@ -19,13 +19,17 @@ const onDelete = async e => {
 
   bookmarkElementToDelete.parentNode.removeChild(bookmarkElementToDelete);
 
-  chrome.tabs.sendMessage(activeTab.id, {
-    type: "DELETE",
-    value: bookmarkTime,
-  }, viewBookmarks);
+  chrome.tabs.sendMessage(
+    activeTab.id,
+    {
+      type: "DELETE",
+      value: bookmarkTime,
+    },
+    viewBookmarks
+  );
 };
 
-const setBookmarkAttributes =  (src, eventListener, controlParentElement) => {
+const setBookmarkAttributes = (src, eventListener, controlParentElement) => {
   const controlElement = document.createElement("img");
 
   controlElement.src = "assets/" + src + ".png";
@@ -34,7 +38,7 @@ const setBookmarkAttributes =  (src, eventListener, controlParentElement) => {
   controlParentElement.appendChild(controlElement);
 };
 
-const viewBookmarks = (currentBookmarks=[]) => {
+const viewBookmarks = (currentBookmarks = []) => {
   const bookmarksElement = document.getElementById("bookmarks");
   bookmarksElement.innerHTML = "";
 
@@ -47,12 +51,15 @@ const viewBookmarks = (currentBookmarks=[]) => {
     tempDiv.appendChild(deleteAllButton);
     bookmarksElement.appendChild(tempDiv);
 
-
     deleteAllButton.addEventListener("click", async () => {
       const activeTab = await getActiveTabURL();
-      chrome.tabs.sendMessage(activeTab.id, {
-        type: "DELETE_ALL",
-      }, viewBookmarks);
+      chrome.tabs.sendMessage(
+        activeTab.id,
+        {
+          type: "DELETE_ALL",
+        },
+        viewBookmarks
+      );
     });
 
     for (let i = 0; i < currentBookmarks.length; i++) {
@@ -93,16 +100,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParameters = new URLSearchParams(queryParameters);
   const currentVideo = urlParameters.get("v");
 
-
-  if ( activeTab.url.includes("youtube.com/watch") && currentVideo ) {
+  if (activeTab.url.includes("youtube.com/watch") && currentVideo) {
     chrome.storage.sync.get([currentVideo], (data) => {
-      const currentVideoBookmarks = data[currentVideo] ? JSON.parse(data[currentVideo]) : [];
-
+      const currentVideoBookmarks = data[currentVideo]
+        ? JSON.parse(data[currentVideo])
+        : [];
       viewBookmarks(currentVideoBookmarks);
     });
   } else {
     const container = document.getElementsByClassName("container")[0];
 
-    container.innerHTML = '<div class="title">This is not a youtube video page.</div>';
+    container.innerHTML = `
+      <div>
+        <div class="title">This is not a youtube video page.</div>
+        <footer>
+          <p>Made by Durgesh Mehar, <a href="https://www.linkedin.com/in/durgeshmehar/">Linkedin</a></p>
+        </footer>
+      </div>
+    `;
   }
 });

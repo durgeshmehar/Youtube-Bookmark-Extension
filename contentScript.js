@@ -39,10 +39,6 @@
     const newVideoLoaded = async () => {
         const bookmarkBtnExists = document.getElementsByClassName("bookmark-btn")[0];
         currentVideoBookmarks = await fetchBookmarks();
-        // if(!currentVideo){
-        //     currentVideo = localStorage.getItem('currentVideo');
-        // }
-        
 
         if (!bookmarkBtnExists) {
             const bookmarkBtn = document.createElement("img");
@@ -83,29 +79,12 @@
         chrome.storage.sync.set({ [currentVideo]: JSON.stringify(currentVideoBookmarks) });
         response(currentVideoBookmarks);
     }
-    else if( type === 'VIEW_ALL'){
-        video_bookmark = []
-        chrome.storage.sync.get(null, function(items) {
-            console.log('Items in storage:', items); // Check the items in storage
-        for (key in items) {
-            try {
-                video_bookmark.push({videoId: key, bookmarks: JSON.parse(items[key])});
-            } catch (error) {
-                console.error('Error parsing item with key', key, ':', error);
-            }
-        }
-        console.log('video_bookmark after getting items:', video_bookmark);
-        response(video_bookmark);
-        });
-    }
   });
-  newVideoLoaded();
 
 })();
 
 const getTime = t => {
     var date = new Date(0);
     date.setSeconds(t);
-
     return date.toISOString().substr(11, 8);
 }
